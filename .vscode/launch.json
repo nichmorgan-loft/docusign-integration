@@ -1,0 +1,14 @@
+{
+    "configurations": [
+        {
+            "name": "Python: Pytest",
+            "type": "python",
+            "request": "launch",
+            "module": "pytest",
+            "justMyCode": false,
+            "args": [
+                "tests"
+            ]
+        }
+    ]
+}

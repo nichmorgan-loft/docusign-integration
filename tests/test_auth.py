@@ -13,10 +13,10 @@ def test_get_user_info(auth_params: AuthParams):
 
 def test_from_session(auth_params: AuthParams):
     auth_api = BaseApi(auth_params)
-    envelop_api = EnvelopeApi.from_session(auth_api)
+    envelop_api = EnvelopeApi(auth_params)
 
-    assert isinstance(auth_api, BaseApi)
-    assert isinstance(envelop_api, EnvelopeApi)
+    assert isinstance(BaseApi.from_session(envelop_api), BaseApi)
+    assert isinstance(EnvelopeApi.from_session(auth_api), EnvelopeApi)
 
     with pytest.raises(TypeError):
         EnvelopeApi.from_session(auth_api.__dict__)

@@ -1,5 +1,5 @@
 from pydantic.dataclasses import dataclass
-from typing import List, Union
+from typing import List, Union, Optional, Callable
 
 
 @dataclass(frozen=True)
@@ -36,9 +36,11 @@ class Scope:
 
 @dataclass
 class AuthParams:
+    base_url: str
     refresh_url: str
     client_id: str
     client_secret: str
     scope: List[Union[Scope, str]]
     access_token: str
     refresh_token: str
+    token_updater: Optional[Callable[[str], None]] = None

@@ -1,8 +1,8 @@
 from pydantic.dataclasses import dataclass
 
 
-@dataclass(frozen=True)
-class IncludeType:
+@dataclass(frozen=True, init=False)
+class IncludeTypeEnum:
     CUSTOM_FIELDS = "custom_fields"
     DOCUMENTS = "documents"
     ATTACHMENTS = "attachments"

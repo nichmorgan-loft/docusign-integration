@@ -25,6 +25,9 @@ addopts = "-vv --cov-report=term-missing --cov=docusign_integration"
 pytestenvvars__env_files = [
     ".test.env",
 ]
+markers = [
+    "skip_by_env: marks tests as without required environment variables"
+]
 
 [build-system]
 requires = ["poetry-core>=1.0.0"]

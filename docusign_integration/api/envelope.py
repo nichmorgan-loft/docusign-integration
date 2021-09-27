@@ -1,13 +1,13 @@
 from typing import List, Optional, Union
 from docusign_integration.models.envelope import (
-    IncludeType,
+    IncludeTypeEnum,
 )
 from docusign_integration.models.response.envelope import (
     EnvelopeDataResponse,
     EnvelopeListDocumentsResponse,
 )
 from docusign_integration.api import BaseApi
-from urllib.parse import urljoin
+from urllib.parse import urlencode, urljoin
 import fitz
 from pydantic import validate_arguments
 
@@ -15,7 +15,11 @@ from pydantic import validate_arguments
 class EnvelopeApi(BaseApi):
     @validate_arguments
     def list_envelope_documents(
-        self, account_id: str, envelope_id: str
+        self,
+        account_id: str,
+        envelope_id: str,
+        only_content: bool = True,
+        **query_params,
     ) -> EnvelopeListDocumentsResponse:
         """Retrieves a list of documents associated with the specified envelope.
 
@@ -31,12 +35,20 @@ class EnvelopeApi(BaseApi):
 
         url = urljoin(
             self.base_url,
-            f"v2.1/accounts/{account_id}/envelopes/{envelope_id}/documents",
+            f"v2.1/accounts/{account_id}/envelopes/{envelope_id}/documents?{urlencode(query_params)}",
         )
         response = self.get(url, stream=True)
         response.raise_for_status()
 
-        return EnvelopeListDocumentsResponse(**response.json())
+        response_data = EnvelopeListDocumentsResponse(**response.json())
+        if only_content:
+            response_data.envelopeDocuments = [
+                document
+                for document in response_data.envelopeDocuments
+                if document.type == "content"
+            ]
+
+        return response_data
 
     @validate_arguments
     def download_envelope_document(
@@ -71,7 +83,7 @@ class EnvelopeApi(BaseApi):
         envelope_id: str,
         *,
         advanced_update: Optional[bool] = None,
-        include: Optional[List[Union[str, IncludeType]]] = None,
+        include: Optional[List[Union[str, IncludeTypeEnum]]] = None,
     ) -> EnvelopeDataResponse:
         """Retrieves the overall status for the specified envelope.
 
@@ -94,11 +106,6 @@ class EnvelopeApi(BaseApi):
             query_params["advanced_update"] = advanced_update
         if include is not None:
             query_params["include"] = ",".join(include)
-
-        if query_params:
-            query_params = query_params.dict(exclude_unset=True, exclude_none=True)
-            if "include" in query_params:
-                query_params["include"] = ",".join(query_params["include"])
 
         response = self.get(url, params=query_params)
         response.raise_for_status()

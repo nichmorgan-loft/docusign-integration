@@ -8,7 +8,7 @@ def test_get_user_info(auth_params: AuthParams):
     api = BaseApi(auth_params)
     user_info = api.get_user_info()
 
-    assert user_info.sub is not None
+    assert user_info.get("sub") is not None
 
 
 def test_from_session(auth_params: AuthParams):

@@ -1,7 +1,6 @@
-from typing import Type
+from typing import Any, Dict, Type
 
 from pydantic.decorator import validate_arguments
-from docusign_integration.models.response.user import UserInfoResponse
 from docusign_integration.models.auth import AuthParams
 from requests_oauthlib.oauth2_session import OAuth2Session
 from urllib.parse import urljoin
@@ -9,12 +8,14 @@ from urllib.parse import urljoin
 
 class BaseApi(OAuth2Session):
     _base_url: str
+    api_version: str
 
     @validate_arguments
-    def __init__(self, auth_params: AuthParams) -> None:
+    def __init__(self, auth_params: AuthParams, api_version: str = "v2.1") -> None:
         if auth_params.base_url[-1] != "/":
             auth_params.base_url += "/"
         self._base_url = auth_params.base_url
+        self._api_version = api_version
 
         OAuth2Session.__init__(
             self,
@@ -67,7 +68,11 @@ class BaseApi(OAuth2Session):
     def base_url(self) -> str:
         return self._base_url
 
-    def get_user_info(self) -> UserInfoResponse:
+    @property
+    def api_version(self) -> str:
+        return self._api_version
+
+    def get_user_info(self) -> Dict[str, Any]:
         """Get user logged info.
 
         Returns:
@@ -76,4 +81,4 @@ class BaseApi(OAuth2Session):
 
         response = self.get(url=urljoin(self.base_url, "oauth/userinfo"))
         response.raise_for_status()
-        return UserInfoResponse(**response.json())
+        return response.json()

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "docusign-integration"
-version = "0.1.0"
+version = "1.1.0"
 description = ""
 authors = ["nichmorgan-loft <nich.morgan@loft.com.br>"]
 
